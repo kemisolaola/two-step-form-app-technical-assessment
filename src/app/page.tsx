@@ -104,8 +104,8 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="max-w-md w-full p-6 bg-white border border-gray-300 rounded-lg shadow-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl bg-white border border-gray-300 rounded-lg shadow-md p-4 sm:p-6 md:p-8">
         <h1 className="text-2xl font-bold mb-4">Create Account</h1>
 
         <Form {...form}>
