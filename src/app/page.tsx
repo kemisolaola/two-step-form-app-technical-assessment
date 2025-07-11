@@ -1,103 +1,320 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { formSchema } from "@/lib/form-schema";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
+type FormData = z.infer<typeof formSchema>;
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    mode: "onChange", // Validate on every input change
+    reValidateMode: "onChange", // Re-validate on change for dynamic updates
+    defaultValues: {
+      email: "",
+      firstName: "",
+      lastName: "",
+      interest: "",
+      terms: false,
+      favorite: "",
+    },
+  });
+
+  const { control, handleSubmit, watch } = form;
+  const interest = watch("interest");
+
+  const onSubmit = (data: FormData) => {
+    setIsSubmitting(true);
+    console.log("Form Submission:", data);
+  };
+
+  const handleNext = () => {
+    form
+      .trigger(["email", "firstName", "lastName", "interest"])
+      .then((isValid) => {
+        if (isValid) setStep(2);
+      });
+  };
+
+  const getFavoriteOptions = (interest: string) => {
+    switch (interest) {
+      case "Cars":
+        return [
+          { value: "Convertible", label: "Convertible" },
+          { value: "Sedan", label: "Sedan" },
+          { value: "SUV", label: "SUV" },
+          { value: "Other", label: "Other" },
+        ];
+      case "Music":
+        return [
+          { value: "Folk", label: "Folk" },
+          { value: "Jazz", label: "Jazz" },
+          { value: "Punk", label: "Punk" },
+          { value: "Other", label: "Other" },
+        ];
+      case "Sport":
+        return [
+          { value: "Baseball", label: "Baseball" },
+          { value: "Basketball", label: "Basketball" },
+          { value: "Football", label: "Football" },
+          { value: "Ice Hockey", label: "Ice Hockey" },
+          { value: "Other", label: "Other" },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const getFavoriteLabel = (interest: string) => {
+    switch (interest) {
+      case "Cars":
+        return "Favorite Car Type";
+      case "Music":
+        return "Favorite Music Genre";
+      case "Sport":
+        return "Favorite Sport";
+      default:
+        return "Favorite";
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="max-w-md w-full p-6 bg-white border border-gray-300 rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold mb-4">Create Account</h1>
+
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {step === 1 && (
+              <>
+                <FormField
+                  control={control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        We'll contact you here with relevant updates.
+                      </p>
+                      <FormControl>
+                        <Input
+                          placeholder="Please enter your email"
+                          {...field}
+                          className={
+                            form.formState.errors.email ? "border-red-700" : ""
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Please enter your first name"
+                          {...field}
+                          className={
+                            form.formState.errors.firstName
+                              ? "border-red-700"
+                              : ""
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Please enter your last name"
+                          {...field}
+                          className={
+                            form.formState.errors.lastName
+                              ? "border-red-700"
+                              : ""
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="interest"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Interest</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger
+                            className={
+                              form.formState.errors.interest
+                                ? "border-red-500"
+                                : ""
+                            }
+                          >
+                            <SelectValue placeholder="Select an interest" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Cars">Cars</SelectItem>
+                          <SelectItem value="Music">Music</SelectItem>
+                          <SelectItem value="Sport">Sport</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    className="rounded-full"
+                  >
+                    <span className="mr-1">Next</span>
+                    <ArrowRight className=" h-4 w-4 " />
+                  </Button>
+                </div>
+              </>
+            )}
+            {step === 2 && (
+              <>
+                <FormField
+                  control={control}
+                  name="favorite"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{getFavoriteLabel(interest)}</FormLabel>
+                      <p className="text-sm text-muted-foreground mt-[2px]">
+                        Choose what you'd like to get updates about.
+                      </p>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger
+                            className={
+                              form.formState.errors.favorite
+                                ? "border-red-500"
+                                : ""
+                            }
+                          >
+                            <SelectValue
+                              placeholder={`Select ${getFavoriteLabel(
+                                interest
+                              ).toLowerCase()}`}
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {getFavoriteOptions(interest).map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={control}
+                  name="terms"
+                  render={({ field }) => (
+                    <>
+                      {" "}
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl className="mt-2">
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className={
+                              form.formState.errors.terms
+                                ? "border-red-500"
+                                : ""
+                            }
+                          />
+                        </FormControl>
+                        <FormLabel>Accept Terms and Conditions</FormLabel>
+                      </FormItem>
+                      <FormMessage />
+                    </>
+                  )}
+                />
+
+                <div className="flex justify-between">
+                  <Button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    disabled={isSubmitting}
+                    variant="outline"
+                    className="border border-primary text-primary rounded-full"
+                  >
+                    <ArrowLeft className="mr-1 h-4 w-4 " />
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`rounded-full px-6 ${
+                      isSubmitting ? "cursor-not-allowed opacity-50" : ""
+                    }`}
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit"}
+                  </Button>
+                </div>
+              </>
+            )}
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }
