@@ -33,8 +33,8 @@ export default function Home() {
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    mode: "onChange", // Validate on every input change
-    reValidateMode: "onChange", // Re-validate on change for dynamic updates
+    mode: "onChange",
+    reValidateMode: "onChange",
     defaultValues: {
       email: "",
       firstName: "",
@@ -246,7 +246,7 @@ export default function Home() {
                           >
                             <SelectValue
                               placeholder={`Select ${getFavoriteLabel(
-                                interest
+                                interest,
                               ).toLowerCase()}`}
                             />
                           </SelectTrigger>

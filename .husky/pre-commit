@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run lint-staged
+echo "Running lint-staged..."
+npx lint-staged
+if [ $? -ne 0 ]; then
+  echo "❌ Linting failed, commit aborted."
+  exit 1
+fi
+
+# Run build
+echo "Running build..."
+npm run build
+if [ $? -ne 0 ]; then
+  echo "❌ Build failed, commit aborted."
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed."
